@@ -1,8 +1,5 @@
-FROM ubuntu
+FROM --platform=${BUILDPLATFORM} ubuntu
 
-ARG BUILD_TIMESTAMP="2023-03-21T11:04:00"  # pattern yyyy-MM-dd'T'HH:mm:ssXXX
-ARG VERSION="0.10"
-ARG GIT_CHECKSUM="0"
 ARG PYTHON_VERSION="3.11.1"
 ARG OPENVSCODE_SERVER_ROOT="/home/.openvscode-server"
 ARG OPENVSCODE_SERVER_RELEASE_TAG="openvscode-server-v1.76.2"
@@ -11,18 +8,7 @@ ARG HOST_USER_NAME="steve"
 ARG HOST_USER_GID="1000"
 ARG HOST_USER_GROUP_NAME="mudgecraft"
 ARG WORKSPACE_ROOT_DIR="/data/workspace"
-
-LABEL "title"="Mudgecraft Workbench" \
-      "name"="Mudgecraft Workbench" \
-      "description"="Mudgecraft Workbench" \
-      "summary"="Mudgecraft Workbench" \
-      "version"="${VERSION}" \
-      "build-date"="${BUILD_TIMESTAMP}" \
-      "org.opencontainers.image.title"="Mudgecraft Workbench" \
-      "org.opencontainers.image.description"="Mudgecraft Workbench" \
-      "org.opencontainers.image.created"="${BUILD_TIMESTAMP}" \
-      "org.opencontainers.image.revision"="${GIT_CHECKSUM}" \
-      "org.opencontainers.image.version"="${VERSION}" 
+ARG TARGETPLATFORM="linux/amd64"
 
 # Update packages and add utilities
 RUN apt update && \
@@ -47,7 +33,14 @@ RUN apt update && \
 RUN curl -sSL https://get.docker.com/ | sh
 
 # VSCode Server
-RUN if [ -z "${OPENVSCODE_SERVER_RELEASE_TAG}" ]; then \
+RUN case ${TARGETPLATFORM} in \
+         "linux/amd64")  OPENVSCODE_SERVER_ARCH=x64    ;; \
+         "linux/arm64")  OPENVSCODE_SERVER_ARCH=arm64  ;; \
+         "linux/arm/v7") OPENVSCODE_SERVER_ARCH=armhf  ;; \
+         "linux/arm/v6") OPENVSCODE_SERVER_ARCH=armel  ;; \
+         "linux/386")    OPENVSCODE_SERVER_ARCH=i386   ;; \
+    esac && \
+    if [ -z "${OPENVSCODE_SERVER_RELEASE_TAG}" ]; then \
         echo "The OPENVSCODE_SERVER_RELEASE_TAG build arg must be set." >&2 && \
         exit 1; \
     fi && \
@@ -60,10 +53,10 @@ RUN if [ -z "${OPENVSCODE_SERVER_RELEASE_TAG}" ]; then \
         arch="armhf"; \
     fi && \
     wget https://github.com/gitpod-io/openvscode-server/releases/download/${OPENVSCODE_SERVER_RELEASE_TAG}/${OPENVSCODE_SERVER_RELEASE_TAG}-linux-${arch}.tar.gz && \
-    tar -xzf ${OPENVSCODE_SERVER_RELEASE_TAG}-linux-${arch}.tar.gz && \
-    mv -f ${OPENVSCODE_SERVER_RELEASE_TAG}-linux-${arch} ${OPENVSCODE_SERVER_ROOT} && \
+    tar -xzf ${OPENVSCODE_SERVER_RELEASE_TAG}-linux-${OPENVSCODE_SERVER_ARCH}.tar.gz && \
+    mv -f ${OPENVSCODE_SERVER_RELEASE_TAG}-linux-${OPENVSCODE_SERVER_ARCH} ${OPENVSCODE_SERVER_ROOT} && \
     cp ${OPENVSCODE_SERVER_ROOT}/bin/remote-cli/openvscode-server ${OPENVSCODE_SERVER_ROOT}/bin/remote-cli/code && \
-    rm -f ${OPENVSCODE_SERVER_RELEASE_TAG}-linux-${arch}.tar.gz
+    rm -f ${OPENVSCODE_SERVER_RELEASE_TAG}-linux-${OPENVSCODE_SERVER_ARCH}.tar.gz
 
 ENV LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
