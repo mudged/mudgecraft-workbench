@@ -1,4 +1,4 @@
-FROM --platform=${BUILDPLATFORM} ubuntu
+FROM ubuntu
 
 ARG PYTHON_VERSION="3.11.1"
 ARG OPENVSCODE_SERVER_ROOT="/home/.openvscode-server"
@@ -33,26 +33,19 @@ RUN apt update && \
 RUN curl -sSL https://get.docker.com/ | sh
 
 # VSCode Server
-RUN case ${TARGETPLATFORM} in \
-         "linux/amd64")  OPENVSCODE_SERVER_ARCH=x64    ;; \
-         "linux/arm64")  OPENVSCODE_SERVER_ARCH=arm64  ;; \
-         "linux/arm/v7") OPENVSCODE_SERVER_ARCH=armhf  ;; \
-         "linux/arm/v6") OPENVSCODE_SERVER_ARCH=armel  ;; \
-         "linux/386")    OPENVSCODE_SERVER_ARCH=i386   ;; \
-    esac && \
-    if [ -z "${OPENVSCODE_SERVER_RELEASE_TAG}" ]; then \
+RUN if [ -z "${OPENVSCODE_SERVER_RELEASE_TAG}" ]; then \
         echo "The OPENVSCODE_SERVER_RELEASE_TAG build arg must be set." >&2 && \
         exit 1; \
     fi && \
     arch=$(uname -m) && \
     if [ "${arch}" = "x86_64" ]; then \
-        arch="x64"; \
+        OPENVSCODE_SERVER_ARCH="x64"; \
     elif [ "${arch}" = "aarch64" ]; then \
-        arch="arm64"; \
+        OPENVSCODE_SERVER_ARCH="arm64"; \
     elif [ "${arch}" = "armv7l" ]; then \
-        arch="armhf"; \
+        OPENVSCODE_SERVER_ARCH="armhf"; \
     fi && \
-    wget https://github.com/gitpod-io/openvscode-server/releases/download/${OPENVSCODE_SERVER_RELEASE_TAG}/${OPENVSCODE_SERVER_RELEASE_TAG}-linux-${arch}.tar.gz && \
+    wget https://github.com/gitpod-io/openvscode-server/releases/download/${OPENVSCODE_SERVER_RELEASE_TAG}/${OPENVSCODE_SERVER_RELEASE_TAG}-linux-${OPENVSCODE_SERVER_ARCH}.tar.gz && \
     tar -xzf ${OPENVSCODE_SERVER_RELEASE_TAG}-linux-${OPENVSCODE_SERVER_ARCH}.tar.gz && \
     mv -f ${OPENVSCODE_SERVER_RELEASE_TAG}-linux-${OPENVSCODE_SERVER_ARCH} ${OPENVSCODE_SERVER_ROOT} && \
     cp ${OPENVSCODE_SERVER_ROOT}/bin/remote-cli/openvscode-server ${OPENVSCODE_SERVER_ROOT}/bin/remote-cli/code && \
