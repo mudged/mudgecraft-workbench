@@ -1,18 +1,16 @@
-name: Docker Image CI
+name: Build Docker Image
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
 jobs:
 
   build:
-
+    name: Build Docker Image
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag mudgecraft-workspace:$(date +%s)
+      run: docker build . --file Dockerfile --tag mudgecraft-workspace:${{ github.ref }}
