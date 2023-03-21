@@ -1,0 +1,7 @@
+{
+    "window.autoDetectColorScheme": true,
+    "window.openFoldersInNewWindow": "on",
+    "window.title": "${dirty}Mudgecraft: ${activeEditorShort}${separator}${rootName}${separator}${appName}${separator}${remoteName}",
+    "security.workspace.trust.untrustedFiles": "open"
+  }
+  

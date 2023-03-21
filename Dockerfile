@@ -1,0 +1,107 @@
+FROM ubuntu
+
+ARG BUILD_TIMESTAMP="2023-03-21T11:04:00"  # pattern yyyy-MM-dd'T'HH:mm:ssXXX
+ARG VERSION="0.10"
+ARG GIT_CHECKSUM="0"
+ARG PYTHON_VERSION="3.11.1"
+ARG OPENVSCODE_SERVER_ROOT="/home/.openvscode-server"
+ARG OPENVSCODE_SERVER_RELEASE_TAG="openvscode-server-v1.76.2"
+ARG HOST_USER_UID="1000"
+ARG HOST_USER_NAME="steve"
+ARG HOST_USER_GID="1000"
+ARG HOST_USER_GROUP_NAME="mudgecraft"
+ARG WORKSPACE_ROOT_DIR="/data/workspace"
+
+LABEL "title"="Mudgecraft Workbench" \
+      "name"="Mudgecraft Workbench" \
+      "description"="Mudgecraft Workbench" \
+      "summary"="Mudgecraft Workbench" \
+      "version"="${VERSION}" \
+      "build-date"="${BUILD_TIMESTAMP}" \
+      "org.opencontainers.image.title"="Mudgecraft Workbench" \
+      "org.opencontainers.image.description"="Mudgecraft Workbench" \
+      "org.opencontainers.image.created"="${BUILD_TIMESTAMP}" \
+      "org.opencontainers.image.revision"="${GIT_CHECKSUM}" \
+      "org.opencontainers.image.version"="${VERSION}" 
+
+# Update packages and add utilities
+RUN apt update && \
+  apt install --no-install-recommends curl -y && \
+  apt install --no-install-recommends wget -y && \
+  apt install --no-install-recommends jq -y && \
+  apt install --no-install-recommends git -y && \
+  apt install --no-install-recommends sudo -y && \
+  apt install --no-install-recommends libatomic1 -y && \
+  apt install --no-install-recommends apt-transport-https -y && \
+  apt install --no-install-recommends gnupg-agent -y && \
+  apt install --no-install-recommends software-properties-common -y && \
+  apt install --no-install-recommends ca-certificates -y && \
+  apt install --no-install-recommends unzip -y && \
+  apt install --no-install-recommends openssh-client -y && \
+  apt install --no-install-recommends python3 -y && \
+  apt install --no-install-recommends python3-venv -y && \
+  apt install --no-install-recommends python3-pip -y && \
+  rm -rf /var/lib/apt/lists/*
+
+# Install Docker
+RUN curl -sSL https://get.docker.com/ | sh
+
+# VSCode Server
+RUN if [ -z "${OPENVSCODE_SERVER_RELEASE_TAG}" ]; then \
+        echo "The OPENVSCODE_SERVER_RELEASE_TAG build arg must be set." >&2 && \
+        exit 1; \
+    fi && \
+    arch=$(uname -m) && \
+    if [ "${arch}" = "x86_64" ]; then \
+        arch="x64"; \
+    elif [ "${arch}" = "aarch64" ]; then \
+        arch="arm64"; \
+    elif [ "${arch}" = "armv7l" ]; then \
+        arch="armhf"; \
+    fi && \
+    wget https://github.com/gitpod-io/openvscode-server/releases/download/${OPENVSCODE_SERVER_RELEASE_TAG}/${OPENVSCODE_SERVER_RELEASE_TAG}-linux-${arch}.tar.gz && \
+    tar -xzf ${OPENVSCODE_SERVER_RELEASE_TAG}-linux-${arch}.tar.gz && \
+    mv -f ${OPENVSCODE_SERVER_RELEASE_TAG}-linux-${arch} ${OPENVSCODE_SERVER_ROOT} && \
+    cp ${OPENVSCODE_SERVER_ROOT}/bin/remote-cli/openvscode-server ${OPENVSCODE_SERVER_ROOT}/bin/remote-cli/code && \
+    rm -f ${OPENVSCODE_SERVER_RELEASE_TAG}-linux-${arch}.tar.gz
+
+ENV LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    EDITOR=code \
+    VISUAL=code \
+    GIT_EDITOR="code --wait" \
+    OPENVSCODE_SERVER_ROOT=$OPENVSCODE_SERVER_ROOT
+
+# Creating the user and usergroup
+RUN groupadd -f --gid ${HOST_USER_GID} ${HOST_USER_GROUP_NAME} \
+    && useradd --uid ${HOST_USER_UID} --gid ${HOST_USER_GROUP_NAME} -m -s /bin/bash ${HOST_USER_NAME} \
+    && echo ${HOST_USER_NAME} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${HOST_USER_NAME} \
+    && chmod 0440 /etc/sudoers.d/${HOST_USER_NAME}
+
+# Add user to docker group
+RUN usermod -a -G docker ${HOST_USER_NAME}
+
+# Create the standard directory structure
+RUN mkdir -p /home/${HOST_USER_NAME}/.openvscode-server/data/Machine /home/${HOST_USER_NAME}/.openvscode-server/extensions ${WORKSPACE_ROOT_DIR}
+RUN chown -R ${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} /home/${HOST_USER_NAME} ${WORKSPACE_ROOT_DIR} ${OPENVSCODE_SERVER_ROOT}
+
+# Add the VS Code settings, scripts and README
+COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} .bashrc /home/${HOST_USER_NAME}/.bashrc
+COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} vscode-machine-settings.json /home/${HOST_USER_NAME}/.openvscode-server/data/Machine/settings.json
+
+# Make scripts executable
+RUN chmod +x /home/${HOST_USER_NAME}/.bashrc
+
+USER ${HOST_USER_NAME}
+WORKDIR ${WORKSPACE_ROOT_DIR}
+
+# Install Python Packages
+RUN pip3 install mciwb mcpi
+
+# Install VSCode Extensions
+RUN cd /home/${HOST_USER_NAME}/.openvscode-server/extensions && wget https://open-vsx.org/api/ms-python/python/2023.4.0/file/ms-python.python-2023.4.0.vsix && \
+    $OPENVSCODE_SERVER_ROOT/bin/openvscode-server --install-extension ms-python.python-2023.4.0.vsix
+
+EXPOSE 3400
+
+ENTRYPOINT [ "/bin/sh", "-c", "exec ${OPENVSCODE_SERVER_ROOT}/bin/openvscode-server --host 0.0.0.0 --port 3400 --without-connection-token \"${@}\"", "--" ]
