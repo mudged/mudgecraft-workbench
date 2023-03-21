@@ -24,4 +24,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
 
       - name: Build the Docker image
-        run: docker buildx build . --file Dockerfile --tag mudgecraft-workspace:${{ github.ref }}
+        run: docker buildx build . --file Dockerfile --tag mudgecraft-workspace:${{ github.run_attempt }}
