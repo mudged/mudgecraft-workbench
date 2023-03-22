@@ -68,15 +68,16 @@ RUN groupadd -f --gid ${HOST_USER_GID} ${HOST_USER_GROUP_NAME} \
 RUN usermod -a -G docker ${HOST_USER_NAME}
 
 # Create the standard directory structure
-RUN mkdir -p /home/${HOST_USER_NAME}/.openvscode-server/data/Machine /home/${HOST_USER_NAME}/.openvscode-server/extensions ${WORKSPACE_ROOT_DIR}
-RUN chown -R ${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} /home/${HOST_USER_NAME} ${WORKSPACE_ROOT_DIR} ${OPENVSCODE_SERVER_ROOT}
+RUN mkdir -p /home/${HOST_USER_NAME}/.openvscode-server/data/Machine /home/${HOST_USER_NAME}/.openvscode-server/extensions ${WORKSPACE_ROOT_DIR} /minecraft/plugins /minecraft/mods
+RUN chown -R ${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} /home/${HOST_USER_NAME} ${WORKSPACE_ROOT_DIR} ${OPENVSCODE_SERVER_ROOT} /minecraft/plugins /minecraft/mods
 
 # Add the VS Code settings, scripts and README
 COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} .bashrc /home/${HOST_USER_NAME}/.bashrc
+COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} scripts/ /home/${HOST_USER_NAME}/
 COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} vscode-machine-settings.json /home/${HOST_USER_NAME}/.openvscode-server/data/Machine/settings.json
 
 # Make scripts executable
-RUN chmod +x /home/${HOST_USER_NAME}/.bashrc
+RUN chmod +x /home/${HOST_USER_NAME}/.bashrc /home/${HOST_USER_NAME}/*.sh
 
 USER ${HOST_USER_NAME}
 WORKDIR ${WORKSPACE_ROOT_DIR}
@@ -88,6 +89,11 @@ RUN pip3 install mciwb mcpi
 RUN cd /home/${HOST_USER_NAME}/.openvscode-server/extensions && wget https://open-vsx.org/api/ms-python/python/2023.4.0/file/ms-python.python-2023.4.0.vsix && \
     $OPENVSCODE_SERVER_ROOT/bin/openvscode-server --install-extension ms-python.python-2023.4.0.vsix
 
+# Copy Minecraft Plugins and Mods
+COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} plugins/ /minecraft/plugins
+COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} mods/ /minecraft/mods
+
 EXPOSE 3400
+VOLUME /data
 
 ENTRYPOINT [ "/bin/sh", "-c", "exec ${OPENVSCODE_SERVER_ROOT}/bin/openvscode-server --host 0.0.0.0 --port 3400 --without-connection-token \"${@}\"", "--" ]
