@@ -2,7 +2,7 @@
 
 CONTAINER_NAME="minecraft-server"
 DIFFICULTY="peaceful"
-LEVEL_TYPE="normal"
+LEVEL_TYPE="minecraft:normal"
 MODE="creative"
 STRUCTURES="false"
 ANIMALS="false"
@@ -11,7 +11,7 @@ NPCS="false"
 CHEATS="false"
 FLIGHT="false"
 PVP="false"
-SEED="1785852800490497919"
+SEED=
 
 # Print Usage
 function print_usage() {
@@ -63,7 +63,7 @@ while [[ "$#" -gt 0 ]]; do
         --peaceful) shift; DIFFICULTY="peaceful";;
 
         # Level Type
-        --flat) shift; LEVEL_TYPE="flat";;
+        --flat) shift; LEVEL_TYPE="minecraft:flat";;
 
         # Mode
         --creative) shift; MODE="creative";;
@@ -111,15 +111,16 @@ docker run --rm --detach \
     -e EULA=TRUE \
     -e TYPE=SPIGOT \
     -e MOTD="Mudgecarft Spigot Minecraft Server" \
-    -e DIFFICULTY="${DIFFICULTY}" \
+    -e DIFFICULTY=${DIFFICULTY} \
     -e LEVEL_TYPE=${LEVEL_TYPE} \
+    -e LEVEL_NAME="Mudgecraft" \
     -e MAX_PLAYERS=10 \
     -e MAX_WORLD_SIZE=1000 \
     -e GENERATE_STRUCTURES=${STRUCTURES} \
     -e SPAWN_ANIMALS=${ANIMALS} \
     -e SPAWN_MONSTERS=${MOSTERS} \
     -e SPAWN_NPCS=${NPCS} \
-    -e SEED="${SEED}" \
+    -e SEED=${SEED} \
     -e MODE=${MODE} \
     -e PVP=${PVP} \
     -e ALLOW_CHEATS=${CHEATS} \
