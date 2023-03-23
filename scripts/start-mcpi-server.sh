@@ -28,12 +28,13 @@ This script is used to (re)start the Minecraft Server for the Python mcpi librar
 
         --flat              Set the Level Type to flat
 
-        --creative          Set the mode to crreative
+        --creative          Set the mode to crreative (default)
         --survival          Set the mode to 
 
         --animals           Allow animals to spawn
         --monsters          Allow monsters to spawn
-        --npcs              Allow NPCS to spawn
+        --villagers         Allow Villagers to spawn
+        --structures        Generate structures
 
         --cheats            Allow cheats
         --flight            Allow flight
@@ -71,7 +72,7 @@ while [[ "$#" -gt 0 ]]; do
         # Spawning
         --animals) shift; ANIMALS="true";;
         --monsters) shift; MONSTERS="true";;
-        --npcs) shift; NPCS="true";;
+        --villages) shift; NPCS="true";;
         --structures) shift; STRUCTURES="true";;
 
         # Cheats
@@ -126,12 +127,17 @@ docker run --rm --detach \
     itzg/minecraft-server
 
 # wait for the server to start
-echo -e "Waiting for Minecraft Server to Start. This may take a few minutes...
+echo -e "Waiting for Minecraft Server to Start."
 CONTAINER_STATUS=$(docker inspect -f='{{json .State.Status}}' ${CONTAINER_NAME} 2> /dev/null | grep "running")
 while [[ "${CONTAINER_STATUS}" != "\"running\"" ]]; do
     sleep 2
     CONTAINER_STATUS=$(docker inspect -f='{{json .State.Status}}' ${CONTAINER_NAME} 2> /dev/null | grep "running")
 done
-
+echo -e "Minecraft Server to Started. Waiting for it to become ready. This may take a few minutes..."
+CONTAINER_STATUS=$(docker inspect -f='{{json .State.Health.Status}}' ${CONTAINER_NAME} 2> /dev/null | grep "healthy")
+while [[ "${CONTAINER_STATUS}" != "\"healthy\"" ]]; do
+    sleep 2
+    CONTAINER_STATUS=$(docker inspect -f='{{json .State.Health.Status}}' ${CONTAINER_NAME} 2> /dev/null | grep "healthy")
+done
 
 echo -e "Finished"

@@ -24,12 +24,11 @@ docker run --rm --detach \
     ghcr.io/mudged/mudgecraft-workbench:main
 
 # wait for the container to be running
-echo -e "Waiting for Mudgecraft Workbench to Start..
+echo -e "Waiting for Mudgecraft Workbench to Start.."
 CONTAINER_STATUS=$(docker inspect -f='{{json .State.Status}}' ${CONTAINER_NAME} 2> /dev/null | grep "running")
 while [[ "${CONTAINER_STATUS}" != "\"running\"" ]]; do
     sleep 2
     CONTAINER_STATUS=$(docker inspect -f='{{json .State.Status}}' ${CONTAINER_NAME} 2> /dev/null | grep "running")
 done
 
-echo -e "Done"
-echo -e "Ready to use at http://localhost"
+echo -e "Ready to use at http://localhost?folder=/home/steve/workspace"
