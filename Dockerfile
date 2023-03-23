@@ -69,16 +69,16 @@ RUN groupadd -f --gid ${HOST_USER_GID} ${HOST_USER_GROUP_NAME} \
 RUN usermod -a -G docker ${HOST_USER_NAME}
 
 # Create the standard directory structure
-RUN mkdir -p /home/${HOST_USER_NAME}/.openvscode-server/data/Machine /home/${HOST_USER_NAME}/.openvscode-server/extensions ${WORKSPACE_DATA_DIR} ${MINECRAFT_SERVER_DATA_DIR} /minecraft/plugins /minecraft/mods
+RUN mkdir -p /home/${HOST_USER_NAME}/.openvscode-server/data/Machine /home/${HOST_USER_NAME}/scripts /home/${HOST_USER_NAME}/.openvscode-server/extensions ${WORKSPACE_DATA_DIR} ${MINECRAFT_SERVER_DATA_DIR} /minecraft/plugins /minecraft/mods
 RUN chown -R ${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} /home/${HOST_USER_NAME} ${WORKSPACE_DATA_DIR} ${MINECRAFT_SERVER_DATA_DIR} ${OPENVSCODE_SERVER_ROOT} /minecraft/plugins /minecraft/mods
 
 # Add the VS Code settings, scripts and README
 COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} .bashrc /home/${HOST_USER_NAME}/.bashrc
-COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} scripts/ /home/${HOST_USER_NAME}/
+COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} scripts/ /home/${HOST_USER_NAME}/scripts/
 COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} vscode-machine-settings.json /home/${HOST_USER_NAME}/.openvscode-server/data/Machine/settings.json
 
 # Make scripts executable
-RUN chmod +x /home/${HOST_USER_NAME}/.bashrc /home/${HOST_USER_NAME}/*.sh
+RUN chmod +x /home/${HOST_USER_NAME}/.bashrc /home/${HOST_USER_NAME}/scripts/*.sh
 
 USER ${HOST_USER_NAME}
 WORKDIR /home/${HOST_USER_NAME}
@@ -102,6 +102,7 @@ VOLUME ${WORKSPACE_DATA_DIR}
 VOLUME ${MINECRAFT_SERVER_DATA_DIR}
 
 ENV WORKSPACE_DATA_DIR=${WORKSPACE_DATA_DIR} \
-    MINECRAFT_SERVER_DATA_DIR=${MINECRAFT_SERVER_DATA_DIR}
+    MINECRAFT_SERVER_DATA_DIR=${MINECRAFT_SERVER_DATA_DIR} \
+    PATH=/home/${HOST_USER_NAME}/scripts:/home/.openvscode-server/bin/remote-cli:${PATH}
 
 ENTRYPOINT [ "/bin/sh", "-c", "exec ${OPENVSCODE_SERVER_ROOT}/bin/openvscode-server --host 0.0.0.0 --port 3400 --without-connection-token \"${@}\"", "--" ]
