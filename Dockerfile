@@ -7,7 +7,8 @@ ARG HOST_USER_UID="1000"
 ARG HOST_USER_NAME="steve"
 ARG HOST_USER_GID="1000"
 ARG HOST_USER_GROUP_NAME="mudgecraft"
-ARG WORKSPACE_ROOT_DIR="/data/workspace"
+ARG WORKSPACE_DATA_DIR="/data/workspace"
+ARG MINECRAFT_SERVER_DATA_DIR="/data/minecraft-server"
 ARG TARGETPLATFORM="linux/amd64"
 
 # Update packages and add utilities
@@ -68,8 +69,8 @@ RUN groupadd -f --gid ${HOST_USER_GID} ${HOST_USER_GROUP_NAME} \
 RUN usermod -a -G docker ${HOST_USER_NAME}
 
 # Create the standard directory structure
-RUN mkdir -p /home/${HOST_USER_NAME}/.openvscode-server/data/Machine /home/${HOST_USER_NAME}/.openvscode-server/extensions ${WORKSPACE_ROOT_DIR} /minecraft/plugins /minecraft/mods
-RUN chown -R ${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} /home/${HOST_USER_NAME} ${WORKSPACE_ROOT_DIR} ${OPENVSCODE_SERVER_ROOT} /minecraft/plugins /minecraft/mods
+RUN mkdir -p /home/${HOST_USER_NAME}/.openvscode-server/data/Machine /home/${HOST_USER_NAME}/.openvscode-server/extensions ${WORKSPACE_DATA_DIR} ${MINECRAFT_SERVER_DATA_DIR} /minecraft/plugins /minecraft/mods
+RUN chown -R ${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} /home/${HOST_USER_NAME} ${WORKSPACE_DATA_DIR} ${MINECRAFT_SERVER_DATA_DIR} ${OPENVSCODE_SERVER_ROOT} /minecraft/plugins /minecraft/mods
 
 # Add the VS Code settings, scripts and README
 COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} .bashrc /home/${HOST_USER_NAME}/.bashrc
@@ -80,7 +81,7 @@ COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} vscode-machine-settings.j
 RUN chmod +x /home/${HOST_USER_NAME}/.bashrc /home/${HOST_USER_NAME}/*.sh
 
 USER ${HOST_USER_NAME}
-WORKDIR ${WORKSPACE_ROOT_DIR}
+WORKDIR /home/${HOST_USER_NAME}
 
 # Install Python Packages
 RUN pip3 install mciwb mcpi
@@ -91,9 +92,16 @@ RUN cd /home/${HOST_USER_NAME}/.openvscode-server/extensions && wget https://ope
 
 # Copy Minecraft Plugins and Mods
 COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} plugins/ /minecraft/plugins
-COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} mods/ /minecraft/mods
+#COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} mods/ /minecraft/mods
+
+# Create a persistant workspace directory in the users home directory
+RUN cd /home/${HOST_USER_NAME} && ln -s ${WORKSPACE_DATA_DIR} workspace
 
 EXPOSE 3400
-VOLUME /data
+VOLUME ${WORKSPACE_DATA_DIR}
+VOLUME ${MINECRAFT_SERVER_DATA_DIR}
+
+ENV WORKSPACE_DATA_DIR=${WORKSPACE_DATA_DIR} \
+    MINECRAFT_SERVER_DATA_DIR=${MINECRAFT_SERVER_DATA_DIR}
 
 ENTRYPOINT [ "/bin/sh", "-c", "exec ${OPENVSCODE_SERVER_ROOT}/bin/openvscode-server --host 0.0.0.0 --port 3400 --without-connection-token \"${@}\"", "--" ]
