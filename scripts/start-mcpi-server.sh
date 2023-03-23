@@ -97,3 +97,6 @@ while [[ "${CONTAINER_STATUS}" != "\"running\"" ]]; do
     sleep 2
     CONTAINER_STATUS=$(docker inspect -f='{{json .State.Status}}' ${CONTAINER_NAME} 2> /dev/null | grep "running")
 done
+
+
+echo -e "Finished"
