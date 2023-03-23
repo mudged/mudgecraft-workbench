@@ -4,6 +4,14 @@ CONTAINER_NAME="minecraft-server"
 DIFFICULTY="peaceful"
 LEVEL_TYPE="normal"
 MODE="creative"
+STRUCTURES="false"
+ANIMALS="false"
+MOSTERS="false"
+NPCS="false"
+CHEATS="false"
+FLIGHT="false"
+PVP="false"
+SEED="1785852800490497919"
 
 # Print Usage
 function print_usage() {
@@ -13,14 +21,27 @@ This script is used to (re)start the Minecraft Server for the Python mcpi librar
 
     The following options are supported:
 
-        -?  --help          Print this message
         --easy              Set the difficulty to easy
         --normal            Set the difficulty to normal
         --hard              Set the difficulty to hard
         --peaceful          Set the difficulty to peaceful (default)
+
         --flat              Set the Level Type to flat
+
         --creative          Set the mode to crreative
-        --survival          Set the mode to survival
+        --survival          Set the mode to 
+
+        --animals           Allow animals to spawn
+        --monsters          Allow monsters to spawn
+        --npcs              Allow NPCS to spawn
+
+        --cheats            Allow cheats
+        --flight            Allow flight
+        --pvp               Allow Players to hurt each other
+
+        --seed              The seed used to create the world
+
+        -?  --help          Print this message
 
     For example..
 
@@ -46,6 +67,20 @@ while [[ "$#" -gt 0 ]]; do
         # Mode
         --creative) shift; MODE="creative";;
         --survival) shift; MODE="survival";;
+
+        # Spawning
+        --animals) shift; ANIMALS="true";;
+        --monsters) shift; MONSTERS="true";;
+        --npcs) shift; NPCS="true";;
+        --structures) shift; STRUCTURES="true";;
+
+        # Cheats
+        --cheats) shift; CHEATS="true";;
+        --flight) shift; FLIGHT="true";;
+
+        # Seed
+        --seed=*) SEED="${1#*=}"; shift;;
+        --seed) shift; SEED="${1}"; shift;;
 
         *) print_usage; break;;
 
@@ -79,15 +114,15 @@ docker run --rm --detach \
     -e LEVEL_TYPE=${LEVEL_TYPE} \
     -e MAX_PLAYERS=10 \
     -e MAX_WORLD_SIZE=1000 \
-    -e GENERATE_STRUCTURES=true \
-    -e SPAWN_ANIMALS=true \
-    -e SPAWN_MONSTERS=false \
-    -e SPAWN_NPCS=false \
-    -e SEED="1785852800490497919" \
+    -e GENERATE_STRUCTURES=${STRUCTURES} \
+    -e SPAWN_ANIMALS=${ANIMALS} \
+    -e SPAWN_MONSTERS=${MOSTERS} \
+    -e SPAWN_NPCS=${NPCS} \
+    -e SEED="${SEED}" \
     -e MODE=${MODE} \
-    -e PVP=false \
-    -e ALLOW_CHEATS=true \
-    -e ALLOW_FLIGHT=TRUE \
+    -e PVP=${PVP} \
+    -e ALLOW_CHEATS=${CHEATS} \
+    -e ALLOW_FLIGHT=${FLIGHT} \
     itzg/minecraft-server
 
 # wait for the server to start
