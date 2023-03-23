@@ -83,7 +83,7 @@ while [[ "$#" -gt 0 ]]; do
         --seed=*) SEED="${1#*=}"; shift;;
         --seed) shift; SEED="${1}"; shift;;
 
-        *) print_usage; break;;
+        *) print_usage; exit 0;;
 
     esac
 done
