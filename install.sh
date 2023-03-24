@@ -11,7 +11,7 @@ docker inspect ${CONTAINER_NAME} >/dev/null 2>&1 && docker rm ${CONTAINER_NAME} 
 
 # Create the Docker network
 echo -e "Creating the Mudgecraft Network..."
-docker network inspect ${NETWORK_NAME} || docker network create ${NETWORK_NAME}
+docker network inspect ${NETWORK_NAME} >/dev/null 2>&1 || docker network create ${NETWORK_NAME}
 
 # Get latest
 echo -e "Fetching the latest Mudgecraft Workbench..."
