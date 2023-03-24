@@ -1,6 +1,7 @@
 #!/bin/bash
 
 CONTAINER_NAME="minecraft-server"
+NETWORK_NAME="mudgecraft"
 DIFFICULTY="peaceful"
 LEVEL_TYPE="minecraft:normal"
 MODE="creative"
@@ -103,6 +104,8 @@ cp -nvr /minecraft/mods/* ${MINECRAFT_SERVER_DATA_DIR}/mods
 echo -e "Starting Minecraft Server..."
 docker run --rm --detach \
     --name ${CONTAINER_NAME} \
+    --network ${NETWORK_NAME} \
+    --hostname "minecraft" \
     -p 25565:25565 \
     -p 4711:4711 \
     -p 25575:25575 \
