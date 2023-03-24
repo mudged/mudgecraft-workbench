@@ -92,7 +92,7 @@ RUN cd /home/${HOST_USER_NAME}/.openvscode-server/extensions && wget https://ope
 
 # Copy Minecraft Plugins and Mods
 COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} plugins/ /minecraft/plugins
-#COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} mods/ /minecraft/mods
+COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} mods/ /minecraft/mods
 
 # Create a persistant workspace directory in the users home directory
 RUN cd /home/${HOST_USER_NAME} && ln -s ${WORKSPACE_DATA_DIR} workspace
