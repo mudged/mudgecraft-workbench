@@ -101,6 +101,12 @@ mkdir -p ${MINECRAFT_SERVER_DATA_DIR}/plugins ${MINECRAFT_SERVER_DATA_DIR}/mods
 cp -nvr /minecraft/plugins/* ${MINECRAFT_SERVER_DATA_DIR}/plugins
 cp -nvr /minecraft/mods/* ${MINECRAFT_SERVER_DATA_DIR}/mods
 
+# check the world exists before using it
+if [[ ! -d "/data/minecraft-worlds/${WORLD}" ]]; then
+    echo -e "The World '${WORLD}' doesn't exist in /data/minecraft-worlds. Ignoring"
+    WORLD=""
+fi
+
 # start the server
 echo -e "Starting Minecraft Server..."
 docker run --rm --detach \
@@ -131,7 +137,7 @@ docker run --rm --detach \
     -e ALLOW_CHEATS=${CHEATS} \
     -e ALLOW_FLIGHT=${FLIGHT} \
     -e FORCE_WORLD_COPY=true \
-    -e WORLD="/worlds/${WORLD}" \
+    -e WORLD=${WORLD} \
     itzg/minecraft-server
 
 # wait for the server to start
@@ -145,6 +151,11 @@ echo -e "Minecraft Server to Started. Waiting for it to become ready. This may t
 CONTAINER_STATUS=$(docker inspect -f='{{json .State.Health.Status}}' ${CONTAINER_NAME} 2> /dev/null | grep "healthy")
 while [[ "${CONTAINER_STATUS}" != "\"healthy\"" ]]; do
     sleep 2
+    CONTAINER_STATUS=$(docker inspect -f='{{json .State.Status}}' ${CONTAINER_NAME} 2> /dev/null | grep "running")
+    if [[ "${CONTAINER_STATUS}" != "\"running\"" ]]; then
+        echo -e "Minecraft Server failed to become ready."
+        exit 1
+    fi
     CONTAINER_STATUS=$(docker inspect -f='{{json .State.Health.Status}}' ${CONTAINER_NAME} 2> /dev/null | grep "healthy")
 done
 
