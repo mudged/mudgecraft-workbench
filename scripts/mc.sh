@@ -15,28 +15,29 @@ This script is used to control the Minecraft Server.
         stop                Stop the Minecraft Server
         reset               Reset the Minecraft Server
         command             Run a command on the Minecraft Server console
+        logs                Show the logs for the Minecraft Server
 
         -?  --help          Print this message
 
     For example:
+
+      mc start --create --flat
 
       mc command summon sheep
 
 EOM
 }
 
-COMMAND=""
-
 # process arguments
-if [[ "$1" -gt 0 ]]; do
-    case $1 in
+if [[ "${#1}" -gt 0 ]]; then
+    case "${1}" in
 
         # commands
         start) shift; mc-start.sh $@;;
         stop) shift; mc-stop.sh $@;;
         reset) shift; mc-reset.sh $@;;
-        command) shift; mc-command.sh $@;;
-        cmd) shift; mc-command.sh $@;;
+        command|cmd) shift; mc-command.sh $@;;
+        log|logs) shift; mc-logs.sh $@;;
 
         # help
         *) print_usage; exit 0;;

@@ -29,7 +29,7 @@ while [[ "$#" -gt 0 ]]; do
         # help
         --help|-?) print_usage; exit 0;;
 
-        *) COMMAND="${COMMAND} ${1}" shift;;
+        *) COMMAND="${COMMAND} ${1}"; shift;;
 
     esac
 done
