@@ -1,7 +1,8 @@
 #!/bin/bash
 
-CONTAINER_NAME="minecraft-server"
-NETWORK_NAME="mudgecraft"
+# Local common
+. mc-common.sh
+
 DIFFICULTY="peaceful"
 LEVEL_TYPE="minecraft:normal"
 MODE="creative"
@@ -19,7 +20,7 @@ WORLD="basic"
 function print_usage() {
 
     cat <<-EOM
-This script is used to (re)start the Minecraft Server for the Python mcpi library.
+This script is used to (re)start the Minecraft Server.
 
     The following options are supported:
 
@@ -91,26 +92,24 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 # stop the server if it is running
-echo -e "Attempting to stop any existing Minecraft Server..."
-docker inspect ${CONTAINER_NAME} >/dev/null 2>&1 && docker stop ${CONTAINER_NAME} || echo -e "The Minecraft Server is not running"
-docker inspect ${CONTAINER_NAME} >/dev/null 2>&1 && docker rm ${CONTAINER_NAME} || echo -e "The Minecraft Server does not exist"
+mc-stop.sh
 
 # ensure the mounted minecraft-server directory is created and populated
-echo -e "Copying Minecraft Plugins and Mods..."
+_log_message "Copying Minecraft Plugins and Mods..."
 mkdir -p ${MINECRAFT_SERVER_DATA_DIR}/plugins ${MINECRAFT_SERVER_DATA_DIR}/mods
 cp -nvr /minecraft/plugins/* ${MINECRAFT_SERVER_DATA_DIR}/plugins
 cp -nvr /minecraft/mods/* ${MINECRAFT_SERVER_DATA_DIR}/mods
 
 # check the world exists before using it
 if [[ ! -d "/data/minecraft-worlds/${WORLD}" ]]; then
-    echo -e "The World '${WORLD}' doesn't exist in /data/minecraft-worlds. Ignoring"
+    _log_message "The World '${WORLD}' doesn't exist in /data/minecraft-worlds. Ignoring"
     WORLD=""
 fi
 
 # start the server
-echo -e "Starting Minecraft Server..."
+_log_message "Starting Minecraft Server..."
 docker run --rm --detach \
-    --name ${CONTAINER_NAME} \
+    --name ${MC_CONTAINER_NAME} \
     --network ${NETWORK_NAME} \
     --hostname "minecraft" \
     -p 25565:25565 \
@@ -138,25 +137,25 @@ docker run --rm --detach \
     -e ALLOW_FLIGHT=${FLIGHT} \
     -e FORCE_WORLD_COPY=true \
     -e WORLD=${WORLD} \
-    itzg/minecraft-server
+    itzg/minecraft-server > /dev/null
 
 # wait for the server to start
-echo -e "Waiting for Minecraft Server to Start."
-CONTAINER_STATUS=$(docker inspect -f='{{json .State.Status}}' ${CONTAINER_NAME} 2> /dev/null | grep "running")
+_log_message "Waiting for Minecraft Server to Start."
+CONTAINER_STATUS=$(docker inspect -f='{{json .State.Status}}' ${MC_CONTAINER_NAME} 2> /dev/null | grep "running")
 while [[ "${CONTAINER_STATUS}" != "\"running\"" ]]; do
     sleep 2
-    CONTAINER_STATUS=$(docker inspect -f='{{json .State.Status}}' ${CONTAINER_NAME} 2> /dev/null | grep "running")
+    CONTAINER_STATUS=$(docker inspect -f='{{json .State.Status}}' ${MC_CONTAINER_NAME} 2> /dev/null | grep "running")
 done
-echo -e "Minecraft Server to Started. Waiting for it to become ready. This may take a few minutes..."
-CONTAINER_STATUS=$(docker inspect -f='{{json .State.Health.Status}}' ${CONTAINER_NAME} 2> /dev/null | grep "healthy")
+_log_message "Minecraft Server to Started. Waiting for it to become ready. This may take a few minutes..."
+CONTAINER_STATUS=$(docker inspect -f='{{json .State.Health.Status}}' ${MC_CONTAINER_NAME} 2> /dev/null | grep "healthy")
 while [[ "${CONTAINER_STATUS}" != "\"healthy\"" ]]; do
     sleep 2
-    CONTAINER_STATUS=$(docker inspect -f='{{json .State.Status}}' ${CONTAINER_NAME} 2> /dev/null | grep "running")
+    CONTAINER_STATUS=$(docker inspect -f='{{json .State.Status}}' ${MC_CONTAINER_NAME} 2> /dev/null | grep "running")
     if [[ "${CONTAINER_STATUS}" != "\"running\"" ]]; then
-        echo -e "Minecraft Server failed to become ready."
+        _log_message "Minecraft Server failed to become ready."
         exit 1
     fi
-    CONTAINER_STATUS=$(docker inspect -f='{{json .State.Health.Status}}' ${CONTAINER_NAME} 2> /dev/null | grep "healthy")
+    CONTAINER_STATUS=$(docker inspect -f='{{json .State.Health.Status}}' ${MC_CONTAINER_NAME} 2> /dev/null | grep "healthy")
 done
 
-echo -e "Finished"
+_log_message "Minecraft Server is Ready"
