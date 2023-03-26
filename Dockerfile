@@ -73,7 +73,7 @@ RUN mkdir -p /home/${HOST_USER_NAME}/.openvscode-server/data/Machine /home/${HOS
 RUN chown -R ${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} /home/${HOST_USER_NAME} ${WORKSPACE_DATA_DIR} ${MINECRAFT_SERVER_DATA_DIR} ${OPENVSCODE_SERVER_ROOT} /minecraft/plugins /minecraft/mods
 
 # Add the VS Code settings, scripts and README
-COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} .bashrc /home/${HOST_USER_NAME}/.bashrc
+#COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} .bashrc /home/${HOST_USER_NAME}/.bashrc
 COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} scripts/ /home/${HOST_USER_NAME}/scripts/
 COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} vscode-machine-settings.json /home/${HOST_USER_NAME}/.openvscode-server/data/Machine/settings.json
 
@@ -96,6 +96,9 @@ COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} mods/ /minecraft/mods
 
 # Create a persistant workspace directory in the users home directory
 RUN cd /home/${HOST_USER_NAME} && ln -s ${WORKSPACE_DATA_DIR} workspace
+
+# copy the samples over
+COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} samples/ /home/${HOST_USER_NAME}/samples/
 
 EXPOSE 3400
 VOLUME ${WORKSPACE_DATA_DIR}
