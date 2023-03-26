@@ -25,6 +25,7 @@ docker run --rm --detach \
     -p 80:3400 \
     -v mudgecraft-workspace-data:/data/workspace \
     -v mudgecraft-minecraft-server-data:/data/minecraft-server \
+    -v mudgecraft-minecraft-world-data:/data/minecraft-worlds \
     -v /var/run/docker.sock:/var/run/docker.sock \
     --group-add ${DOCKER_GID} \
     ghcr.io/mudged/mudgecraft-workbench:main

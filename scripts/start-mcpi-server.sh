@@ -13,6 +13,7 @@ CHEATS="false"
 FLIGHT="false"
 PVP="false"
 SEED=
+WORLD="basic"
 
 # Print Usage
 function print_usage() {
@@ -110,6 +111,7 @@ docker run --rm --detach \
     -p 4711:4711 \
     -p 25575:25575 \
     -v mudgecraft-minecraft-server-data:/data \
+    -v mudgecraft-minecraft-world-data:/worlds:ro \
     -e SERVER_NAME=Mudgecraft \
     -e EULA=TRUE \
     -e TYPE=SPIGOT \
@@ -128,6 +130,8 @@ docker run --rm --detach \
     -e PVP=${PVP} \
     -e ALLOW_CHEATS=${CHEATS} \
     -e ALLOW_FLIGHT=${FLIGHT} \
+    -e FORCE_WORLD_COPY=true \
+    -e WORLD="/worlds/${WORLD}" \
     itzg/minecraft-server
 
 # wait for the server to start
