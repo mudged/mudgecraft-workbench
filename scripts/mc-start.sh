@@ -95,10 +95,10 @@ done
 mc-stop.sh
 
 # ensure the mounted minecraft-server directory is created and populated
-_log_message "Copying Minecraft Plugins and Mods..."
-mkdir -p ${MINECRAFT_SERVER_DATA_DIR}/plugins ${MINECRAFT_SERVER_DATA_DIR}/mods
-cp -nvr /minecraft/plugins/* ${MINECRAFT_SERVER_DATA_DIR}/plugins
-cp -nvr /minecraft/mods/* ${MINECRAFT_SERVER_DATA_DIR}/mods
+# _log_message "Copying Minecraft Plugins and Mods..."
+# mkdir -p ${MINECRAFT_SERVER_DATA_DIR}/plugins ${MINECRAFT_SERVER_DATA_DIR}/mods
+# cp -nvr /minecraft/plugins/* ${MINECRAFT_SERVER_DATA_DIR}/plugins
+# cp -nvr /minecraft/mods/* ${MINECRAFT_SERVER_DATA_DIR}/mods
 
 # check the world exists before using it
 if [[ ! -d "/data/minecraft-worlds/${WORLD}" ]]; then
@@ -120,6 +120,7 @@ docker run --rm --detach \
     -e SERVER_NAME=Mudgecraft \
     -e EULA=TRUE \
     -e TYPE=SPIGOT \
+    -e SPIGET_RESOURCES=22724 \
     -e MOTD="Mudgecarft Spigot Minecraft Server" \
     -e DIFFICULTY=${DIFFICULTY} \
     -e LEVEL_TYPE=${LEVEL_TYPE} \
