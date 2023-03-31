@@ -69,8 +69,8 @@ RUN groupadd -f --gid ${HOST_USER_GID} ${HOST_USER_GROUP_NAME} \
 RUN usermod -a -G docker ${HOST_USER_NAME}
 
 # Create the standard directory structure
-RUN mkdir -p /home/${HOST_USER_NAME}/.openvscode-server/data/Machine /home/${HOST_USER_NAME}/scripts /home/${HOST_USER_NAME}/.openvscode-server/extensions ${WORKSPACE_DATA_DIR} ${MINECRAFT_SERVER_DATA_DIR} /minecraft/plugins /minecraft/mods
-RUN chown -R ${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} /home/${HOST_USER_NAME} ${WORKSPACE_DATA_DIR} ${MINECRAFT_SERVER_DATA_DIR} ${OPENVSCODE_SERVER_ROOT} /minecraft/plugins /minecraft/mods
+RUN mkdir -p /home/${HOST_USER_NAME}/.openvscode-server/data/Machine /home/${HOST_USER_NAME}/scripts /home/${HOST_USER_NAME}/.openvscode-server/extensions ${WORKSPACE_DATA_DIR} ${MINECRAFT_SERVER_DATA_DIR}
+RUN chown -R ${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} /home/${HOST_USER_NAME} ${WORKSPACE_DATA_DIR} ${MINECRAFT_SERVER_DATA_DIR} ${OPENVSCODE_SERVER_ROOT}
 
 # Add the VS Code settings, scripts and README
 COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} scripts/ /home/${HOST_USER_NAME}/scripts/
@@ -89,10 +89,6 @@ RUN pip3 install mciwb mcpi
 # Install VSCode Extensions
 RUN cd /home/${HOST_USER_NAME}/.openvscode-server/extensions && wget https://open-vsx.org/api/ms-python/python/2023.4.0/file/ms-python.python-2023.4.0.vsix && \
     $OPENVSCODE_SERVER_ROOT/bin/openvscode-server --install-extension ms-python.python-2023.4.0.vsix
-
-# Copy Minecraft Plugins and Mods
-COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} plugins/ /minecraft/plugins
-COPY --chown=${HOST_USER_NAME}:${HOST_USER_GROUP_NAME} mods/ /minecraft/mods
 
 # Create a persistant workspace directory in the users home directory
 RUN cd /home/${HOST_USER_NAME} && ln -s ${WORKSPACE_DATA_DIR} workspace
