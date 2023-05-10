@@ -23,7 +23,7 @@ This script is used to control the Minecraft Server.
 
       mc start --create --flat
 
-      mc command summon sheep
+      mc command time set day
 
 EOM
 }
