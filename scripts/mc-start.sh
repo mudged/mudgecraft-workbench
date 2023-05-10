@@ -32,7 +32,7 @@ This script is used to (re)start the Minecraft Server.
         --flat              Set the Level Type to flat
 
         --creative          Set the mode to crreative (default)
-        --survival          Set the mode to 
+        --survival          Set the mode to survival
 
         --animals           Allow animals to spawn
         --monsters          Allow monsters to spawn
