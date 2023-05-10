@@ -16,7 +16,6 @@ carpet_colour = 11
 
 # work out the dimensions (inside and out)
 start_position = vec3.Vec3(10, -1, 10)
-# start_position = mc.player.getTilePos()
 end_position = start_position + vec3.Vec3(width, height, length)
 
 #work out the inside space
