@@ -15,6 +15,7 @@ FLIGHT="false"
 PVP="false"
 SEED=
 WORLD="basic"
+ADDITIONAL_SPIGET_RESOURCES="1997,8846"  # adds the morph plugin
 
 # Print Usage
 function print_usage() {
@@ -120,7 +121,7 @@ docker run --rm --detach \
     -e SERVER_NAME=Mudgecraft \
     -e EULA=TRUE \
     -e TYPE=SPIGOT \
-    -e SPIGET_RESOURCES=22724 \
+    -e SPIGET_RESOURCES=22724,${ADDITIONAL_SPIGET_RESOURCES} \
     -e MOTD="Mudgecarft Spigot Minecraft Server" \
     -e DIFFICULTY=${DIFFICULTY} \
     -e LEVEL_TYPE=${LEVEL_TYPE} \
