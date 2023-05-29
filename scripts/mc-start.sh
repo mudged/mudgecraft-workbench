@@ -76,7 +76,7 @@ while [[ "$#" -gt 0 ]]; do
         # Spawning
         --animals) shift; ANIMALS="true";;
         --monsters) shift; MONSTERS="true";;
-        --villages) shift; NPCS="true";;
+        --villagers) shift; NPCS="true";;
         --structures) shift; STRUCTURES="true";;
 
         # Cheats
