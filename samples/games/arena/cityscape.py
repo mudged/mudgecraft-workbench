@@ -3,16 +3,16 @@ import mcpi.vec3 as vec3
 import mcpi.block as block
 import math
 from random import randrange
-from buidings.skyscrapers.skyscraper import Skyscraper
-from games.arena import PittedArena, Arena
+from buildings.skyscrapers.skyscraper import Skyscraper
+from games.arena.arena import PittedArena, Arena
 
 
 class Cityscape:
 
-    arena = None
+    game_arena = None
 
-    def __init__(self, arena):
-        self.arena = arena
+    def __init__(self, game_arena):
+        self.game_arena = game_arena
 
    
     def build(self, mc):
@@ -25,8 +25,8 @@ class Cityscape:
         building_gap = building_width + building_spacer
 
         # work out the number of buildings needed
-        number_of_x_buildings = math.ceil(arena.width / building_gap) + 2
-        number_of_y_buildings = math.ceil(arena.length / building_gap) + 2
+        number_of_x_buildings = math.ceil(self.game_arena.width / building_gap) + 2
+        number_of_y_buildings = math.ceil(self.game_arena.length / building_gap) + 2
         print(f"Building city scape of { number_of_x_buildings } by { number_of_y_buildings } buildings")
 
         # work out the length and width of the cityscape
@@ -34,7 +34,7 @@ class Cityscape:
         city_scape_length = (building_width * number_of_y_buildings) + (building_spacer * (number_of_y_buildings - 1))
 
         # work out the start position based on the centre of the arena
-        city_scape_start_position = arena.position - vec3.Vec3((city_scape_width / 2), arena.position.y, (city_scape_length / 2))
+        city_scape_start_position = self.game_arena.position - vec3.Vec3((city_scape_width / 2), self.game_arena.position.y, (city_scape_length / 2))
 
         # clear the entire area
         mc.setBlocks(
@@ -71,4 +71,4 @@ class Cityscape:
                         structure_brick_colour=frame_colours[randrange(0, len(frame_colours))]).build(mc, position=building_pos)
 
         # build the arena
-        arena.build(mc)
+        self.game_arena.build(mc)
