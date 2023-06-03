@@ -1,7 +1,7 @@
 import mcpi.minecraft as minecraft
 import mcpi.vec3 as vec3
 import mcpi.block as block
-
+import math
 
 
 class Arena:
@@ -17,8 +17,9 @@ class Arena:
     wall_brick_id = CONCRETE
     wall_brick_colour = 0
     height_to_clear = 50
+    lights = True
 
-    def __init__(self, width=30, length=75, height=6, position=vec3.Vec3(0, 0, 0), floor_brick_id=CONCRETE, floor_brick_colour=1, wall_brick_id=CONCRETE, wall_brick_colour=0):
+    def __init__(self, width=30, length=75, height=6, position=vec3.Vec3(0, 0, 0), floor_brick_id=CONCRETE, floor_brick_colour=1, wall_brick_id=CONCRETE, wall_brick_colour=0, lights=True):
         self.width = width
         self.length = length
         self.height = height
@@ -27,6 +28,7 @@ class Arena:
         self.floor_brick_colour = floor_brick_colour
         self.wall_brick_id = wall_brick_id
         self.wall_brick_colour = wall_brick_colour
+        self.lights = lights
 
     def getArenaBoxStartPosition(self):
         return vec3.Vec3(self.position.x - (self.width / 2), self.position.y, self.position.z - (self.length / 2))
@@ -61,6 +63,18 @@ class Arena:
         mc.setBlocks(start_pos.x, stripe_y, start_pos.z, start_pos.x, stripe_y, end_pos.z, self.floor_brick_id, self.floor_brick_colour)
         mc.setBlocks(end_pos.x, stripe_y, start_pos.z, end_pos.x, stripe_y, end_pos.z, self.floor_brick_id, self.floor_brick_colour)
         mc.setBlocks(start_pos.x, stripe_y, end_pos.z, end_pos.x, stripe_y, end_pos.z, self.floor_brick_id, self.floor_brick_colour)
+        
+        # lights
+        if self.lights:
+            lights_y = end_pos.y - 1
+            for x in range(math.floor(start_pos.x), math.floor(end_pos.x)):
+                if x % 3 == 0:
+                    mc.setBlock(x, lights_y, start_pos.z, block.GLOWSTONE_BLOCK.id)
+                    mc.setBlock(x, lights_y, end_pos.z, block.GLOWSTONE_BLOCK.id)
+            for z in range(math.floor(start_pos.z), math.floor(end_pos.z)):
+                if z % 3 == 0:
+                    mc.setBlock(start_pos.x, lights_y, z, block.GLOWSTONE_BLOCK.id)
+                    mc.setBlock(end_pos.x, lights_y, z, block.GLOWSTONE_BLOCK.id)
 
 
 class PittedArena(Arena):
@@ -69,8 +83,8 @@ class PittedArena(Arena):
     pit_sides_length = 4
     pit_fill_block_id = block.AIR.id
 
-    def __init__(self, width=30, length=75, height=6, position=vec3.Vec3(0, 0, 0), floor_brick_id=Arena.CONCRETE, floor_brick_colour=1, wall_brick_id=Arena.CONCRETE, wall_brick_colour=0, pit_depth=4, pit_sides_length=4, pit_fill_block_id=block.AIR.id):
-        super().__init__(width, length, height, position, floor_brick_id, floor_brick_colour, wall_brick_id, wall_brick_colour)
+    def __init__(self, width=30, length=75, height=6, position=vec3.Vec3(0, 0, 0), floor_brick_id=Arena.CONCRETE, floor_brick_colour=1, wall_brick_id=Arena.CONCRETE, wall_brick_colour=0, lights=True, pit_depth=4, pit_sides_length=4, pit_fill_block_id=block.AIR.id):
+        super().__init__(width, length, height, position, floor_brick_id, floor_brick_colour, wall_brick_id, wall_brick_colour, lights)
         self.pit_depth = pit_depth
         self.pit_sides_length = pit_sides_length
         self.pit_fill_block_id = pit_fill_block_id
