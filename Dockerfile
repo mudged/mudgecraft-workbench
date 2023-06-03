@@ -102,6 +102,7 @@ VOLUME ${MINECRAFT_SERVER_DATA_DIR}
 
 ENV WORKSPACE_DATA_DIR=${WORKSPACE_DATA_DIR} \
     MINECRAFT_SERVER_DATA_DIR=${MINECRAFT_SERVER_DATA_DIR} \
-    PATH=/home/${HOST_USER_NAME}/scripts:/home/.openvscode-server/bin/remote-cli:${PATH}
+    PATH=/home/${HOST_USER_NAME}/scripts:/home/.openvscode-server/bin/remote-cli:${PATH} \
+    PYTHONPATH=/home/steve/samples
 
 ENTRYPOINT [ "/bin/sh", "-c", "exec ${OPENVSCODE_SERVER_ROOT}/bin/openvscode-server --host 0.0.0.0 --port 3400 --without-connection-token \"${@}\"", "--" ]
