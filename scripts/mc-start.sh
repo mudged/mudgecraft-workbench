@@ -15,7 +15,7 @@ FLIGHT="false"
 PVP="false"
 SEED=
 WORLD="basic"
-ADDITIONAL_SPIGET_RESOURCES="1997,8846"  # adds the morph plugin
+ADDITIONAL_SPIGET_RESOURCES="1997,8846,84751,52849"  # adds the morph, powercamera and advancedreplay plugin
 
 # Print Usage
 function print_usage() {

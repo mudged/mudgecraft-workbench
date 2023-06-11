@@ -2,33 +2,23 @@ import mcpi.minecraft as minecraft
 import mcpi.vec3 as vec3
 import mcpi.block as block
 import math
+import common
 
 
 class Arena:
 
-    CONCRETE = 251
+    height_to_clear = 100
 
-    width = 30
-    length = 75
-    height = 6
-    position = vec3.Vec3(0, 5, 0)
-    floor_brick_id = CONCRETE
-    floor_brick_colour = 1
-    wall_brick_id = CONCRETE
-    wall_brick_colour = 0
-    height_to_clear = 50
-    lights = True
-
-    def __init__(self, width=30, length=75, height=6, position=vec3.Vec3(0, 0, 0), floor_brick_id=CONCRETE, floor_brick_colour=1, wall_brick_id=CONCRETE, wall_brick_colour=0, lights=True):
-        self.width = width
-        self.length = length
-        self.height = height
-        self.position = position
-        self.floor_brick_id = floor_brick_id
-        self.floor_brick_colour = floor_brick_colour
-        self.wall_brick_id = wall_brick_id
-        self.wall_brick_colour = wall_brick_colour
-        self.lights = lights
+    def __init__(self, width:int=30, length:int=75, height:int=6, position:vec3.Vec3=vec3.Vec3(0, 0, 0), floor_brick_id:int=common.CONCRETE, floor_brick_colour:int=common.ORANGE, wall_brick_id:int=common.CONCRETE, wall_brick_colour:int=common.WHITE, lights:bool=False):
+        self.width: int = width
+        self.length: int = length
+        self.height: int = height
+        self.position: vec3.Vec3 = position
+        self.floor_brick_id: int = floor_brick_id
+        self.floor_brick_colour: int = floor_brick_colour
+        self.wall_brick_id: int = wall_brick_id
+        self.wall_brick_colour: int = wall_brick_colour
+        self.lights: bool = lights
 
     def getArenaBoxStartPosition(self):
         return vec3.Vec3(self.position.x - (self.width / 2), self.position.y, self.position.z - (self.length / 2))
@@ -38,7 +28,7 @@ class Arena:
         return self.getArenaBoxStartPosition() + vec3.Vec3(self.width, self.height, self.length)
 
 
-    def build(self, mc):
+    def build(self, mc: minecraft.Minecraft):
 
         # position will be the middle of the arean, so start position is half the width and length
         start_pos = self.getArenaBoxStartPosition()
@@ -79,15 +69,12 @@ class Arena:
 
 class PittedArena(Arena):
 
-    pit_depth = 4
-    pit_sides_length = 4
-    pit_fill_block_id = block.AIR.id
-
-    def __init__(self, width=30, length=75, height=6, position=vec3.Vec3(0, 0, 0), floor_brick_id=Arena.CONCRETE, floor_brick_colour=1, wall_brick_id=Arena.CONCRETE, wall_brick_colour=0, lights=True, pit_depth=4, pit_sides_length=4, pit_fill_block_id=block.AIR.id):
+    def __init__(self, width:int=30, length:int=75, height:int=6, position:vec3.Vec3=vec3.Vec3(0, 0, 0), floor_brick_id:int=common.CONCRETE, floor_brick_colour:int=common.ORANGE, wall_brick_id:int=common.CONCRETE, wall_brick_colour:int=common.WHITE, lights:bool=False, pit_depth:int=4, pit_sides_length:int=4, pit_fill_depth:int=1, pit_fill_block_id:int=block.AIR.id):
         super().__init__(width, length, height, position, floor_brick_id, floor_brick_colour, wall_brick_id, wall_brick_colour, lights)
-        self.pit_depth = pit_depth
-        self.pit_sides_length = pit_sides_length
-        self.pit_fill_block_id = pit_fill_block_id
+        self.pit_depth: int = pit_depth
+        self.pit_sides_length: int = pit_sides_length
+        self.pit_fill_depth: int = pit_fill_depth
+        self.pit_fill_block_id: int = pit_fill_block_id
 
 
     def getPitBoxStartPosition(self):
@@ -98,7 +85,7 @@ class PittedArena(Arena):
         return self.getArenaBoxEndPosition() - vec3.Vec3(1, self.height + 1 , self.pit_sides_length + 1)
 
 
-    def build(self, mc):
+    def build(self, mc: minecraft.Minecraft):
 
         # pit frame - create a box under the arena
         start_pos = self.getArenaBoxStartPosition()
@@ -117,5 +104,5 @@ class PittedArena(Arena):
 
         # pit fill (already full of air)
         if self.pit_fill_block_id != block.AIR.id:
-            mc.setBlocks(start_pos.x, start_pos.y, start_pos.z, end_pos.x, end_pos.y - 1, end_pos.z, self.pit_fill_block_id)
+            mc.setBlocks(start_pos.x, start_pos.y, start_pos.z, end_pos.x, start_pos.y - self.pit_fill_depth, end_pos.z, self.pit_fill_block_id)
 

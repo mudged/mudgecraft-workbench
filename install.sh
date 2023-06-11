@@ -14,8 +14,8 @@ echo -e "Creating the Mudgecraft Network..."
 docker network inspect ${NETWORK_NAME} >/dev/null 2>&1 || docker network create ${NETWORK_NAME}
 
 # Get latest
-echo -e "Fetching the latest Mudgecraft Workbench..."
-docker pull ghcr.io/mudged/mudgecraft-workbench:main
+# echo -e "Fetching the latest Mudgecraft Workbench..."
+# docker pull ghcr.io/mudged/mudgecraft-workbench:main
 
 # Start container
 echo -e "Starting the Mudgecraft Workbench..."

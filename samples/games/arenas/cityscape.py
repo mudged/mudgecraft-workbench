@@ -3,22 +3,21 @@ import mcpi.vec3 as vec3
 import mcpi.block as block
 import math
 from random import randrange
-from buildings.skyscrapers.skyscraper import Skyscraper
-from games.arena.arena import PittedArena, Arena
+from buildings.skyscraper import Skyscraper
+from games.arenas.arena import Arena
+import common
 
 
 class Cityscape:
 
-    game_arena = None
-
-    def __init__(self, game_arena):
+    def __init__(self, game_arena:Arena):
         self.game_arena = game_arena
 
    
-    def build(self, mc):
+    def build(self, mc: minecraft.Minecraft):
 
         floors_numbers = range(10, 20)
-        frame_colours = [0, 7, 8, 15, 4, 3, 14, 0, 7, 8, 15] 
+        frame_colours = [common.WHITE, common.GRAY, common.LIGHT_GRAY, common.BLACK, common.YELLOW, common.LIGHT_BLUE, common.RED, common.WHITE, common.GRAY, common.LIGHT_GRAY, common.BLACK] 
 
         building_width = 15
         building_spacer = 8
@@ -54,7 +53,7 @@ class Cityscape:
             city_scape_start_position.x + city_scape_width + building_spacer, 
             city_scape_start_position.y, 
             city_scape_start_position.z + city_scape_length + building_spacer, 
-            Arena.CONCRETE, 15)
+            common.CONCRETE, 15)
 
         for y in range(0, number_of_y_buildings):
 
