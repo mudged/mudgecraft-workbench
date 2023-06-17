@@ -1,3 +1,5 @@
+import mcpi.vec3 as vec3
+
 CONCRETE = 251
 
 NONE = 0
@@ -17,3 +19,15 @@ BROWN = 12
 GREEN = 13
 RED = 14
 BLACK = 15
+
+NORTH = vec3.Vec3(0, 0, 1)
+EAST = vec3.Vec3(1, 0, 0)
+SOUTH = vec3.Vec3(0, 0, -1)
+WEST = vec3.Vec3(-1, 0, 0)
+NORTH_EAST = NORTH + EAST
+SOUTH_EAST = SOUTH + EAST
+NORTH_WEST = NORTH + WEST
+SOUTH_WEST = SOUTH + WEST
+
+ABOVE = vec3.Vec3(0, 1, 0)
+BELOW = vec3.Vec3(0, -1, 0)

@@ -1,15 +1,14 @@
 import mcpi.minecraft as minecraft
 import mcpi.vec3 as vec3
 import mcpi.block as block
-import common
 from games.arenas.arena import PittedArena
 from games.arenas.cityscape import Cityscape
 from games.players.player import PlayerMonitor
 from games.players.teleporter import PlayerTeleporter, BelowLevelSourceArea
-from games.blocks.chagingblocks import *
+from games.blocks.chagingblocks import ChangingBlock, ChangingBlockController, OrangeBlockTransition, ThinAirBlockTransition, ResetBlockTransition
+import common
 import math
 import time
-from random import randrange
 
 mc = minecraft.Minecraft.create(address="minecraft")
 
@@ -22,10 +21,8 @@ block_controller = ChangingBlockController(player_monitor)
 player_teleporter = PlayerTeleporter(player_monitor)
 
 # teleport any player that goes below the area floor
-player_teleporter.addSourceArea(BelowLevelSourceArea(game_arena.getArenaBoxStartPosition().y - 1))
-player_teleporter.addTargetPosition(game_arena.getArenaBoxStartPosition() + vec3.Vec3(game_arena.width / 2, 1, 2))
-player_teleporter.addTargetPosition(game_arena.getArenaBoxStartPosition() + vec3.Vec3((game_arena.width / 2) - 1, 1, 2))
-player_teleporter.addTargetPosition(game_arena.getArenaBoxStartPosition() + vec3.Vec3((game_arena.width / 2) + 1, 1, 2))
+player_teleporter.addSourceArea(BelowLevelSourceArea(game_arena.getArenaBoxStartPosition().y - 2))
+player_teleporter.addTargetPositions(game_arena.getArenaStartArea())
 
 # create a "lid" over the arena pit using chaning blocks
 pit_start_pos = game_arena.getPitBoxStartPosition()

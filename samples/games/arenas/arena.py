@@ -28,6 +28,17 @@ class Arena:
         return self.getArenaBoxStartPosition() + vec3.Vec3(self.width, self.height, self.length)
 
 
+    def getArenaStartArea(self):
+        middle_of_startof_arena = self.getArenaBoxStartPosition() + vec3.Vec3(self.width / 2, 0, 2)
+
+        area = []
+        area.append(middle_of_startof_arena)
+        area.append(middle_of_startof_arena + common.EAST)
+        area.append(middle_of_startof_arena + common.WEST)
+
+        return area
+
+
     def build(self, mc: minecraft.Minecraft):
 
         # position will be the middle of the arean, so start position is half the width and length
@@ -54,6 +65,18 @@ class Arena:
         mc.setBlocks(end_pos.x, stripe_y, start_pos.z, end_pos.x, stripe_y, end_pos.z, self.floor_brick_id, self.floor_brick_colour)
         mc.setBlocks(start_pos.x, stripe_y, end_pos.z, end_pos.x, stripe_y, end_pos.z, self.floor_brick_id, self.floor_brick_colour)
         
+        # start area highlight
+        middle_of_startof_arena = start_pos + vec3.Vec3((self.width / 2) - 2, 0, 0)
+        mc.setBlocks(middle_of_startof_arena.x, start_pos.y, start_pos.z, middle_of_startof_arena.x, start_pos.y + 1, start_pos.z, self.floor_brick_id, self.floor_brick_colour)
+        mc.setBlocks(middle_of_startof_arena.x + 4, start_pos.y, start_pos.z, middle_of_startof_arena.x + 4, start_pos.y + 1, start_pos.z, self.floor_brick_id, self.floor_brick_colour)
+        mc.setBlocks(middle_of_startof_arena.x, start_pos.y + 2, start_pos.z, middle_of_startof_arena.x + 4, start_pos.y + 2, start_pos.z, self.floor_brick_id, self.floor_brick_colour)
+       
+        # stop area highlight
+        middle_of_startof_arena = start_pos + vec3.Vec3((self.width / 2) - 2, 0, 0)
+        mc.setBlocks(middle_of_startof_arena.x, start_pos.y, end_pos.z, middle_of_startof_arena.x, start_pos.y + 1, end_pos.z, self.floor_brick_id, self.floor_brick_colour)
+        mc.setBlocks(middle_of_startof_arena.x + 4, start_pos.y, end_pos.z, middle_of_startof_arena.x + 4, start_pos.y + 1, end_pos.z, self.floor_brick_id, self.floor_brick_colour)
+        mc.setBlocks(middle_of_startof_arena.x, start_pos.y + 2, end_pos.z, middle_of_startof_arena.x + 4, start_pos.y + 2, end_pos.z, self.floor_brick_id, self.floor_brick_colour)
+
         # lights
         if self.lights:
             lights_y = end_pos.y - 1

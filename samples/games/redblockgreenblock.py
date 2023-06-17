@@ -1,13 +1,11 @@
 import mcpi.minecraft as minecraft
 import mcpi.vec3 as vec3
 import mcpi.block as block
-import common
 from games.arenas.arena import PittedArena
 from games.arenas.cityscape import Cityscape
 from games.players.player import PlayerMonitor
 from games.players.teleporter import PlayerTeleporter, AnywhereExceptSourceArea
-from games.blocks.chagingblocks import *
-import math
+import common
 import time
 from random import randrange
 
@@ -21,16 +19,12 @@ player_monitor = PlayerMonitor()
 player_teleporter = PlayerTeleporter(player_monitor)
 
 # teleport any player back to the side of the arena
-player_teleporter.addTargetPosition(game_arena.getArenaBoxStartPosition() + vec3.Vec3(game_arena.width / 2, 0, 2))
-player_teleporter.addTargetPosition(game_arena.getArenaBoxStartPosition() + vec3.Vec3((game_arena.width / 2) - 1, 0, 2))
-player_teleporter.addTargetPosition(game_arena.getArenaBoxStartPosition() + vec3.Vec3((game_arena.width / 2) + 1, 0, 2))
+player_teleporter.addTargetPositions(game_arena.getArenaStartArea())
 
-# create a "lid" over the arena pit using glass blocks
-pit_start_pos = game_arena.getPitBoxStartPosition()
-pit_end_pos = game_arena.getPitBoxEndPosition()
-
-mc.setBlocks(pit_start_pos.x, pit_end_pos.y, pit_start_pos.z, pit_end_pos.x, pit_end_pos.y, pit_end_pos.z, block.STAINED_GLASS.id)
-
+# create a glass floor
+floor_start_pos = game_arena.getPitBoxStartPosition()
+floor_end_pos = game_arena.getPitBoxEndPosition()
+mc.setBlocks(floor_start_pos.x, floor_end_pos.y, floor_start_pos.z, floor_end_pos.x, floor_end_pos.y, floor_end_pos.z, block.STAINED_GLASS.id)
 
 # start the teleporter
 player_teleporter.start()
@@ -40,14 +34,14 @@ for player_entity_id in mc.getPlayerEntityIds():
     player_monitor.addPlayerEntityId(player_entity_id)
 player_monitor.start()
 
-
+# loop forever
 while True:
 
     # red light
     time.sleep(randrange(1, 6))
 
     mc.postToChat("Red Light!")
-    mc.setBlocks(pit_start_pos.x, pit_end_pos.y, pit_start_pos.z, pit_end_pos.x, pit_end_pos.y, pit_end_pos.z, block.STAINED_GLASS.id, common.RED)
+    mc.setBlocks(floor_start_pos.x, floor_end_pos.y, floor_start_pos.z, floor_end_pos.x, floor_end_pos.y, floor_end_pos.z, block.STAINED_GLASS.id, common.RED)
 
     # allow humamns to react
     time.sleep(0.5)
@@ -65,6 +59,6 @@ while True:
     player_teleporter.source_areas.clear()
 
     mc.postToChat("Green Light!")
-    mc.setBlocks(pit_start_pos.x, pit_end_pos.y, pit_start_pos.z, pit_end_pos.x, pit_end_pos.y, pit_end_pos.z, block.STAINED_GLASS.id, common.GREEN)
+    mc.setBlocks(floor_start_pos.x, floor_end_pos.y, floor_start_pos.z, floor_end_pos.x, floor_end_pos.y, floor_end_pos.z, block.STAINED_GLASS.id, common.GREEN)
 
     

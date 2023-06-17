@@ -1,7 +1,7 @@
 import mcpi.minecraft as minecraft
 import mcpi.block as block
 import mcpi.vec3 as vec3
-
+import common
 
 class Skyscraper:
     
@@ -93,6 +93,13 @@ class Skyscraper:
         x = start_pos.x + (self.width / 2) - (self.floor_height / 2)
         y = start_pos.y + 1
         z = start_pos.z + self.width / 2
+
+        # build the side walls
+        mc.setBlocks(x, y, z - 1, x + self.floor_height - 1, y + self.floor_height - 2, z - 1, self.structure_brick_id, self.structure_brick_colour)
+        mc.setBlocks(x, y, z + 2, x + self.floor_height - 1, y + self.floor_height - 2, z + 2, self.structure_brick_id, self.structure_brick_colour)
+        light_y = y + self.floor_height - 2
+        mc.setBlocks(x, light_y, z - 1, x + self.floor_height - 1, light_y, z - 1, block.GLOWSTONE_BLOCK.id)
+        mc.setBlocks(x, light_y, z + 2, x + self.floor_height - 1, light_y, z + 2, block.GLOWSTONE_BLOCK.id)
 
         # you don't need a hole on the ground floor
         if floor_number > 1:

@@ -1,15 +1,19 @@
 import mcpi.minecraft as minecraft
 import mcpi.vec3 as vec3
 import mcpi.block as block
-import common
 from games.arenas.arena import PittedArena
 from games.arenas.cityscape import Cityscape
 from games.players.player import PlayerMonitor
 from games.players.teleporter import PlayerTeleporter, BelowLevelSourceArea
-from games.blocks.chagingblocks import *
+from games.blocks.chagingblocks import ChangingBlock, ChangingBlockController, ChangingBlockTransition, GlassBlockTransition, ThinAirBlockTransition, ResetBlockTransition
+import common
 import math
-import time
 from random import randrange
+
+# variables
+layer_gap_height = 8
+number_of_layers = 4
+side_buffer = 3
 
 mc = minecraft.Minecraft.create(address="minecraft")
 
@@ -20,11 +24,6 @@ Cityscape(game_arena).build(mc)
 player_monitor = PlayerMonitor()
 block_controller = ChangingBlockController(player_monitor)
 player_teleporter = PlayerTeleporter(player_monitor)
-
-# set the number of layers and the gap between them
-layer_gap_height = 8
-number_of_layers = 4
-side_buffer = 3
 
 # get the dimentions of the pit
 pit_start_pos = game_arena.getPitBoxStartPosition()
@@ -39,13 +38,13 @@ spawn_y_offset = (layer_gap_height * number_of_layers) + layer_gap_height
 layer_start_pos = pit_start_pos + vec3.Vec3(side_buffer, spawn_y_offset, side_buffer)
 layer_end_pos = pit_start_pos + vec3.Vec3(game_arena.width - (side_buffer * 2), spawn_y_offset, pit_length - (side_buffer * 2))
 
-# target corners
+# target corners of the top layer 
 player_teleporter.addTargetPosition(layer_start_pos + vec3.Vec3(1, 0, 1))
 player_teleporter.addTargetPosition(layer_start_pos + vec3.Vec3(layer_end_pos.x - layer_start_pos.x - 1, 0, 1))
 player_teleporter.addTargetPosition(layer_end_pos - vec3.Vec3(1, 0, 1))
 player_teleporter.addTargetPosition(layer_start_pos + vec3.Vec3(1, 0, layer_end_pos.z - layer_start_pos.z - 1))
 
-# target middle
+# target middle of the top layer
 player_teleporter.addTargetPosition(layer_start_pos + vec3.Vec3( (layer_end_pos.x - layer_start_pos.x) / 2, 0, (layer_end_pos.z - layer_start_pos.z) / 2))
 
 # the colours of the layers

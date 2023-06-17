@@ -74,11 +74,12 @@ class ResetBlockTransition(ChangingBlockTransition):
 
 class ChangingBlockController:
       
-    def __init__(self, player_monitor:PlayerMonitor, blocks:List[ChangingBlock]=[], transitions:List[ChangingBlockTransition]=[], use_large_area:bool=True):
+    def __init__(self, player_monitor:PlayerMonitor, blocks:List[ChangingBlock]=[], transitions:List[ChangingBlockTransition]=[], interval: float=0.5, use_large_area:bool=True):
         self.player_monitor: PlayerMonitor = player_monitor
         self.blocks: List[ChangingBlock] = blocks
         self.transitions: List[ChangingBlockTransition] = transitions
         self.use_large_area: bool = use_large_area
+        self.interval: float = interval
         self.running: bool = False
 
 
@@ -119,20 +120,20 @@ class ChangingBlockController:
             positions_to_check: List[vec3.Vec3] = []
             
             for player in self.player_monitor.getPlayers():
-                block_below_player_position = player.position - vec3.Vec3(0, 1, 0)
+                block_below_player_position = player.position + common.BELOW
                 positions_to_check.append(block_below_player_position)
 
                 # trigger around the block
                 if self.use_large_area:
 
-                    positions_to_check.append(block_below_player_position + vec3.Vec3(0, 0, 1)) # north
-                    positions_to_check.append(block_below_player_position + vec3.Vec3(1, 0, 1)) # north east
-                    positions_to_check.append(block_below_player_position + vec3.Vec3(1, 0, 0)) # east
-                    positions_to_check.append(block_below_player_position + vec3.Vec3(1, 0, -1)) # south east
-                    positions_to_check.append(block_below_player_position + vec3.Vec3(0, 0, -1)) # south
-                    positions_to_check.append(block_below_player_position + vec3.Vec3(-1, 0, -1)) # south west
-                    positions_to_check.append(block_below_player_position + vec3.Vec3(-1, 0, 0)) # west
-                    positions_to_check.append(block_below_player_position + vec3.Vec3(-1, 0, 1)) # north west
+                    positions_to_check.append(block_below_player_position + common.NORTH)
+                    positions_to_check.append(block_below_player_position + common.NORTH_EAST)
+                    positions_to_check.append(block_below_player_position + common.EAST)
+                    positions_to_check.append(block_below_player_position + common.SOUTH_EAST)
+                    positions_to_check.append(block_below_player_position + common.SOUTH)
+                    positions_to_check.append(block_below_player_position + common.SOUTH_WEST)
+                    positions_to_check.append(block_below_player_position + common.WEST)
+                    positions_to_check.append(block_below_player_position + common.NORTH_WEST)
                    
             groups_to_trigger: List[int] = []
             trigger_time = round(time.time() * 1000)
@@ -156,7 +157,7 @@ class ChangingBlockController:
                         block.time_triggered = trigger_time
             
 
-            time.sleep(0.5)
+            time.sleep(self.interval)
 
 
     def _monitor_blocks(self, mc: minecraft.Minecraft):
@@ -196,6 +197,4 @@ class ChangingBlockController:
                         else:
                             block.current_transition = block.current_transition + 1 
 
-
-
-            time.sleep(0.5)
+            time.sleep(self.interval)

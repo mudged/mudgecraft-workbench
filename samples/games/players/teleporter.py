@@ -57,6 +57,7 @@ class PlayerTeleporter:
         self.source_areas: List[TeleporterSourceArea] = []
         self.target_positions: List[vec3.Vec3] = []
         self.current_target_position_index: int = 0
+        self.interval:float = 0.5
         
         
     def addSourceArea(self, source: TeleporterSourceArea):
@@ -66,6 +67,11 @@ class PlayerTeleporter:
     def addTargetPosition(self, target: vec3.Vec3):
         self.target_positions.append(target)
         
+
+    def addTargetPositions(self, targets: List[vec3.Vec3]):
+        for target in targets:
+            self.addTargetPosition(target)
+
         
     def start(self, mc: minecraft.Minecraft = None):
     
@@ -114,5 +120,5 @@ class PlayerTeleporter:
                         finished_with_player = True
                         break
             
-            time.sleep(0.5)
+            time.sleep(self.interval)
         
