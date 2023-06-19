@@ -1,0 +1,3 @@
+effect clear @a
+effect give @a minecraft:jump_boost infinite 128 true
+effect give @a minecraft:slowness infinite 2 true

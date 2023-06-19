@@ -3,11 +3,13 @@ import mcpi.vec3 as vec3
 import mcpi.block as block
 from games.arenas.arena import PittedArena
 from games.arenas.cityscape import Cityscape
+from games.commands.commands import run_standard_setup
 from games.players.player import PlayerMonitor
 from games.players.teleporter import PlayerTeleporter, AnywhereExceptSourceArea
 import common
 import time
 from random import randrange
+from typing import List
 
 mc = minecraft.Minecraft.create(address="minecraft")
 
@@ -33,6 +35,8 @@ player_teleporter.start()
 for player_entity_id in mc.getPlayerEntityIds():
     player_monitor.addPlayerEntityId(player_entity_id)
 player_monitor.start()
+
+run_standard_setup()
 
 # loop forever
 while True:
@@ -60,5 +64,3 @@ while True:
 
     mc.postToChat("Green Light!")
     mc.setBlocks(floor_start_pos.x, floor_end_pos.y, floor_start_pos.z, floor_end_pos.x, floor_end_pos.y, floor_end_pos.z, block.STAINED_GLASS.id, common.GREEN)
-
-    

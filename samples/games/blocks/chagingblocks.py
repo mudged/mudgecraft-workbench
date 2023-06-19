@@ -35,7 +35,13 @@ class OrangeBlockTransition(ChangingBlockTransition):
     
     def __init__(self, time_after_trigger: int = 0):
         super().__init__(time_after_trigger=time_after_trigger, block_id=common.CONCRETE, block_colour=common.ORANGE)
-        
+
+
+class GreenBlockTransition(ChangingBlockTransition):
+    
+    def __init__(self, time_after_trigger: int = 0):
+        super().__init__(time_after_trigger=time_after_trigger, block_id=common.CONCRETE, block_colour=common.GREEN)
+
 
 class RedBlockTransition(ChangingBlockTransition):
     
@@ -85,6 +91,13 @@ class ChangingBlockController:
 
     def addBlock(self, block: ChangingBlock):
         self.blocks.append(block)
+
+
+    def removeBlockAtPosition(self, position: vec3.Vec3):
+        for block in self.blocks:
+            if block.position == position:
+                self.blocks.remove(block)
+                break
 
 
     def addTransition(self, transition: ChangingBlockTransition):

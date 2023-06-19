@@ -1,0 +1,12 @@
+time set day
+gamerule doDaylightCycle false
+weather clear
+gamemode fallDamage false
+gamemode fireDamage false
+gamemode keepInventory true 
+gamemode adventure @a
+team add one
+team join one @a
+team modify one nametagVisibility never
+team modify one deathMessageVisibility never
+effect clear @a

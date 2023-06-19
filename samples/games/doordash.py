@@ -3,6 +3,7 @@ import mcpi.vec3 as vec3
 import mcpi.block as block
 from games.arenas.arena import PittedArena
 from games.arenas.cityscape import Cityscape
+from games.commands.commands import run_standard_setup
 from games.players.player import PlayerMonitor
 from games.players.teleporter import PlayerTeleporter, BelowLevelSourceArea, AreaSourceArea
 from games.blocks.chagingblocks import ChangingBlock, ChangingBlockController, OrangeBlockTransition, ThinAirBlockTransition, ResetBlockTransition
@@ -95,3 +96,5 @@ for player_entity_id in mc.getPlayerEntityIds():
 # player_teleporter.interval = 0.2
 # player_monitor.interval = 0.2
 player_monitor.start()
+
+run_standard_setup()
